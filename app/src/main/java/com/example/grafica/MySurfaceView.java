@@ -2,20 +2,19 @@ package com.example.grafica;
 
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import androidx.annotation.NonNull;
 
 public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder surfaceHolder;
     private Canvas canvas;
+    private DrawThread drawThread;
+
     public MySurfaceView(Context context) {
         super(context);
         getHolder().addCallback(this);
@@ -29,31 +28,41 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         surfaceHolder = getHolder();
-        canvas = surfaceHolder.lockCanvas();
 
+        Bitmap picture = BitmapFactory.decodeResource(getResources(), R.drawable.bonk);
         Paint paint = new Paint();
+        Physics physics = new Physics(canvas.getWidth(), canvas.getHeight(), picture);
+        Draw draw = new Draw(paint, surfaceHolder);
+        DrawThread drawThread = new DrawThread(surfaceHolder, draw, physics, picture);
 
-        Physics physics = new Physics(canvas.getWidth(), canvas.getHeight());
-
-        Draw draw = new Draw(canvas, paint);
-
-        DrawThread drawThread = new DrawThread(surfaceHolder);
         drawThread.setRunning(true);
         drawThread.start();
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        drawThread.setRunning(false);
+        try {
+            drawThread.join();
+        } catch (InterruptedException e) {
+        }
     }
 }
 
 class DrawThread extends Thread {
     private SurfaceHolder surfaceHolder;
-    public boolean runFlag = true;
+    private Bitmap picture;
+    private boolean runFlag = false;
+    private Draw draw;
+    private Physics physics;
+    private int[] cord = new int[2];
 
-    DrawThread(SurfaceHolder surfaceHolder) {
+    DrawThread(SurfaceHolder surfaceHolder, Draw draw, Physics physics, Bitmap picture) {
+        this.picture = picture;
         this.surfaceHolder = surfaceHolder;
+        this.draw = draw;
+        this.physics = physics;
+        cord = physics.getCord();
     }
 
     public void setRunning(boolean flag){
@@ -62,18 +71,10 @@ class DrawThread extends Thread {
 
     @Override
     public void run() {
-        Canvas canvas;
-        long lastActuation = 0;
         while (runFlag) {
-            long now = System.currentTimeMillis();
-            if (now - lastActuation >= 16){
-                lastActuation = now;
-                canvas = surfaceHolder.lockCanvas();
-
-
-            }
-
-
+            physics.CheckCollision();
+            draw.DrawObject(cord, picture);
+            cord = physics.CountingPhysics();
         }
     }
 }
