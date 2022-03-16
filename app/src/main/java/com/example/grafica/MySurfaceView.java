@@ -2,11 +2,12 @@ package com.example.grafica;
 
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.AttributeSet;
+import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -17,6 +18,13 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     public MySurfaceView(Context context) {
         super(context);
+        surfaceHolder = getHolder();
+        getHolder().addCallback(this);
+    }
+
+    public MySurfaceView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        surfaceHolder = getHolder();
         getHolder().addCallback(this);
     }
 
@@ -27,12 +35,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        surfaceHolder = getHolder();
-
         Bitmap picture = BitmapFactory.decodeResource(getResources(), R.drawable.bonk);
         Paint paint = new Paint();
-        Physics physics = new Physics(canvas.getWidth(), canvas.getHeight(), picture);
-        Draw draw = new Draw(paint, surfaceHolder);
+        Physics physics = new Physics(1080, 2183, picture);
+        Draw draw = new Draw(paint, holder);
         DrawThread drawThread = new DrawThread(surfaceHolder, draw, physics, picture);
 
         drawThread.setRunning(true);
@@ -57,7 +63,7 @@ class DrawThread extends Thread {
     private Physics physics;
     private int[] cord = new int[2];
 
-    DrawThread(SurfaceHolder surfaceHolder, Draw draw, Physics physics, Bitmap picture) {
+    public DrawThread(SurfaceHolder surfaceHolder, Draw draw, Physics physics, Bitmap picture) {
         this.picture = picture;
         this.surfaceHolder = surfaceHolder;
         this.draw = draw;

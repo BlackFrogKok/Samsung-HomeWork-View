@@ -7,9 +7,10 @@ public class Physics {
     private int weightScreen;
     private int heightScreen;
     private SurfaceHolder holder;
-    private int x, y;
-    private static int reverseX, reverseY;
-    private int speed = 2;
+    private int picW, picH;
+    private int reverseX = 1;
+    private int reverseY = 1;
+    private int speed = 1;
     private int[] cord = new int[2];
 
     Physics(int weightScreen, int heightScreen, Bitmap picture){
@@ -17,8 +18,8 @@ public class Physics {
         this.heightScreen = heightScreen;
         cord[0] = weightScreen / 2;
         cord[1] = heightScreen / 2;
-        x = picture.getWidth();
-        y = picture.getHeight();
+        picW = picture.getWidth();
+        picH = picture.getHeight();
 
     }
 
@@ -27,9 +28,9 @@ public class Physics {
     }
 
     public void CheckCollision(){
-        if (cord[0] + x >= weightScreen) {
+        if (cord[0] + picW >= weightScreen) {
             reverseX = -1;
-        } else if (cord[1] + y >= heightScreen) {
+        } else if (cord[1] + picH >= heightScreen) {
             reverseY = -1;
         }
         else if (cord[0] <= 0){
@@ -41,7 +42,7 @@ public class Physics {
     }
     public int[] CountingPhysics(){
         cord[0] = cord[0] + (reverseX * speed * 9);
-        cord[1] = cord[1] + (reverseY * speed * 16);
+        cord[1] = cord[1] + (reverseY * speed * 20);
         return cord;
     }
 }

@@ -6,9 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.example.grafica.MyView
+    <com.example.grafica.MySurfaceView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/kk"/>
+        android:id="@+id/ll"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
